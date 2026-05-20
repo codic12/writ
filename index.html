@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Writ</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <button id="exit-focus-btn" onclick="toggleFocusMode()">Exit Focus</button>
+
+    <div id="app-wrapper">
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <span>Library</span>
+                <button onclick="createNewNotebook()" title="New Notebook">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </button>
+            </div>
+            <div id="file-list"></div>
+        </div>
+
+        <div id="main-container">
+            <div id="tabs-bar">
+                <button onclick="toggleSidebar()" title="Toggle Sidebar" style="background:none; border:none; color:var(--text-muted); padding: 0 15px; cursor:pointer; -webkit-app-region: no-drag; display:flex; align-items:center;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                </button>
+                <div id="tab-container" class="tab-bar-content"></div>
+            </div>
+            
+            <!-- Selection Floating Menu -->
+            <div id="selection-menu" class="floating-menu">
+                <button onclick="format('bold')" title="Bold"><b>B</b></button>
+                <button onclick="format('italic')" title="Italic"><i>I</i></button>
+                <button onclick="format('underline')" title="Underline"><u>U</u></button>
+                <div class="separator" style="height:12px;"></div>
+                <button onclick="format('insertUnorderedList')" title="List">• List</button>
+                <div class="separator" style="height:12px;"></div>
+                <button onclick="format('formatBlock', 'h1')">H1</button>
+                <button onclick="format('formatBlock', 'h2')">H2</button>
+            </div>
+
+            <div id="editor-viewport">
+                <div id="editor" contenteditable="true" spellcheck="true" placeholder="Start writing..."></div>
+            </div>
+
+            <div id="status-bar">
+                <div id="file-path">Untitled</div>
+                <div id="word-count">0 words</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Command Palette -->
+    <div id="command-palette" class="modal-overlay">
+        <div class="command-content">
+            <div class="command-input-container">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="command-input" placeholder="Search documents or commands..." autocomplete="off">
+            </div>
+            <div id="command-results"></div>
+            <div class="command-footer">
+                <span>↑↓ to navigate</span>
+                <span>Enter to select</span>
+                <span>Esc to dismiss</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

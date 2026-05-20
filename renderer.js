@@ -247,6 +247,80 @@ function createTab(filePath = null, content = '', id = null, name = null) {
     renderTabs(); renderFileList();
 }
 
+function createNewNotebook(e) {
+    if (e) e.stopPropagation();
+    const notebook = {
+        id: Date.now().toString(),
+        name: 'New Notebook',
+        collapsed: false,
+        documents: []
+    };
+    notebooks.push(notebook);
+    saveNotebooks();
+    renderFileList();
+}
+
+function showNotebookRename(e, notebookId, header = null, titleSpan = null) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    renameNotebookInline(notebookId, header, titleSpan);
+}
+
+function renameNotebookInline(notebookId, header = null, titleSpan = null) {
+    const notebook = notebooks.find(n => n.id === notebookId);
+    if (!notebook) return;
+
+    if (!header) header = document.querySelector(`[data-notebook-id="${notebookId}"]`);
+    if (!header) return;
+    if (!titleSpan) titleSpan = header.querySelector('.notebook-title');
+    if (!titleSpan) return;
+    if (header.querySelector('.rename-input')) return;
+
+    titleSpan.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'rename-input';
+    input.value = notebook.name;
+
+    const commit = () => {
+        const newName = input.value.trim();
+        notebook.name = newName || notebook.name;
+        saveNotebooks();
+        renderFileList();
+    };
+
+    const cancel = () => {
+        renderFileList();
+    };
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+    });
+    input.addEventListener('blur', () => commit());
+
+    header.appendChild(input);
+    input.focus();
+    input.select();
+}
+
+function createNewDocument(notebookId = null, e = null) {
+    if (e) e.stopPropagation();
+    const notebook = notebookId ? notebooks.find(n => n.id === notebookId) : notebooks[0];
+    if (!notebook) return;
+
+    const noteId = Date.now().toString();
+    const noteName = 'Untitled';
+    const noteContent = `<h1 class="note-title">${noteName}</h1><p><br></p>`;
+
+    notebook.documents.push({ id: noteId, name: noteName, content: noteContent });
+    saveNotebooks();
+    createTab(null, noteContent, noteId, noteName);
+    renderFileList();
+}
+
 function closeTab(id, e) {
     if (e) e.stopPropagation();
     if (id === 'scratchpad') return;
@@ -348,8 +422,8 @@ function renderFileList() {
         
         const header = document.createElement('div');
         header.className = 'notebook-header';
+        header.dataset.notebookId = notebook.id;
         header.onclick = (e) => toggleNotebook(notebook.id, e);
-        header.oncontextmenu = (e) => showNotebookRename(e, notebook.id);
         
         const collapseIcon = document.createElement('div');
         collapseIcon.className = 'collapse-icon';
@@ -360,17 +434,29 @@ function renderFileList() {
         titleSpan.className = 'notebook-title';
         titleSpan.textContent = notebook.name;
         header.appendChild(titleSpan);
+
+        header.oncontextmenu = (e) => showNotebookRename(e, notebook.id, header, titleSpan);
+        header.ondblclick = (e) => showNotebookRename(e, notebook.id, header, titleSpan);
         
         const actions = document.createElement('div');
         actions.className = 'actions';
         
         const addBtn = document.createElement('button');
+        addBtn.type = 'button';
         addBtn.title = 'New Document';
         addBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
-        addBtn.onclick = (e) => createNewDocument(notebook.id, e);
+        addBtn.onclick = (e) => { e.stopPropagation(); createNewDocument(notebook.id, e); };
         actions.appendChild(addBtn);
 
+        const renameBtn = document.createElement('button');
+        renameBtn.type = 'button';
+        renameBtn.title = 'Rename Notebook';
+        renameBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>`;
+        renameBtn.onclick = (e) => { e.stopPropagation(); showNotebookRename(e, notebook.id, header, titleSpan); };
+        actions.appendChild(renameBtn);
+
         const delBtn = document.createElement('button');
+        delBtn.type = 'button';
         delBtn.title = 'Delete Notebook';
         delBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
         delBtn.onclick = (e) => deleteNotebook(notebook.id, e);

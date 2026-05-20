@@ -6,6 +6,20 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="titlebar">
+        <div class="titlebar-drag-region"></div>
+        <div class="window-controls">
+            <button class="control-btn minimize" onclick="minimizeWindow()" title="Minimize">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button class="control-btn maximize" onclick="maximizeWindow()" title="Maximize">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+            </button>
+            <button class="control-btn close" onclick="closeWindow()" title="Close">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
     <button id="exit-focus-btn" onclick="toggleFocusMode()">Exit Focus</button>
 
     <div id="app-wrapper">

@@ -2,6 +2,15 @@ const { ipcRenderer } = require('electron');
 const path = require('path');
 const TurndownService = require('turndown');
 
+// Platform Detection
+const isMac = process.platform === 'darwin';
+if (isMac) document.body.classList.add('platform-mac');
+
+// Window Controls
+window.minimizeWindow = () => ipcRenderer.send('window-minimize');
+window.maximizeWindow = () => ipcRenderer.send('window-maximize');
+window.closeWindow = () => ipcRenderer.send('window-close');
+
 let tabs = [];
 let activeTabId = null;
 let darkMode = localStorage.getItem('dark-mode') === 'true';

@@ -3,13 +3,16 @@ const path = require('path');
 const fs = require('fs');
 
 function createWindow() {
+  const isMac = process.platform === 'darwin';
+
   const win = new BrowserWindow({
     width: 1000,
     height: 800,
-    titleBarStyle: 'hiddenInset',
-    vibrancy: 'under-window',
-    visualEffectState: 'active',
-    backgroundColor: '#00000000',
+    titleBarStyle: isMac ? 'hiddenInset' : 'hidden',
+    frame: isMac,
+    vibrancy: isMac ? 'under-window' : undefined,
+    visualEffectState: isMac ? 'active' : undefined,
+    backgroundColor: isMac ? '#00000000' : '#ffffff',
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -52,6 +55,24 @@ function createWindow() {
     }
   });
 }
+
+// IPC Handlers for Window Controls
+ipcMain.on('window-minimize', (event) => {
+  BrowserWindow.fromWebContents(event.sender)?.minimize();
+});
+
+ipcMain.on('window-maximize', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win?.isMaximized()) {
+    win.unmaximize();
+  } else {
+    win?.maximize();
+  }
+});
+
+ipcMain.on('window-close', (event) => {
+  BrowserWindow.fromWebContents(event.sender)?.close();
+});
 
 // IPC Handlers for File I/O
 ipcMain.handle('save-file', async (event, content, defaultPath) => {

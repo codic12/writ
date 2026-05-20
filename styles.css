@@ -1,8 +1,8 @@
 :root {
     /* Light Theme (Default) */
-    --bg-app: transparent; 
-    --bg-sidebar: rgba(255, 255, 255, 0.7);
-    --bg-tabs: rgba(250, 250, 248, 0.6);
+    --bg-app: #ffffff; 
+    --bg-sidebar: #f5f5f7;
+    --bg-tabs: #f0f0f2;
     --bg-editor: #ffffff; 
     --bg-tab-active: #ffffff;
     --text-main: #000000;
@@ -13,12 +13,20 @@
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-mono: "SF Mono", "Fira Code", "Menlo", "Monaco", monospace;
     --shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --titlebar-height: 32px;
+}
+
+body.platform-mac {
+    --bg-app: transparent; 
+    --bg-sidebar: rgba(255, 255, 255, 0.7);
+    --bg-tabs: rgba(250, 250, 248, 0.6);
+    --titlebar-height: 0px;
 }
 
 body.dark-mode {
-    --bg-app: transparent;
-    --bg-sidebar: rgba(30, 30, 30, 0.4);
-    --bg-tabs: rgba(40, 40, 40, 0.4);
+    --bg-app: #1a1a1a;
+    --bg-sidebar: #252525;
+    --bg-tabs: #2a2a2a;
     --bg-editor: #1a1a1a; 
     --bg-tab-active: #1a1a1a;
     --text-main: #ffffff;
@@ -28,17 +36,77 @@ body.dark-mode {
     --shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
+body.dark-mode.platform-mac {
+    --bg-app: transparent;
+    --bg-sidebar: rgba(30, 30, 30, 0.4);
+    --bg-tabs: rgba(40, 40, 40, 0.4);
+}
+
 * { box-sizing: border-box; outline: none; }
 
 html, body {
     margin: 0; padding: 0; width: 100%; height: 100%; 
-    background-color: transparent; 
+    background-color: var(--bg-app); 
     color: var(--text-main); font-family: var(--font-sans); overflow: hidden;
     user-select: none;
 }
 
+/* Custom Titlebar */
+#titlebar {
+    height: var(--titlebar-height);
+    background-color: var(--bg-sidebar);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+body.platform-mac #titlebar {
+    display: none;
+}
+
+.titlebar-drag-region {
+    flex: 1;
+    height: 100%;
+    -webkit-app-region: drag;
+}
+
+.window-controls {
+    display: flex;
+    height: 100%;
+    -webkit-app-region: no-drag;
+}
+
+.control-btn {
+    width: 46px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.control-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.control-btn.close:hover {
+    background-color: #e81123;
+    color: white;
+}
+
 #app-wrapper {
-    display: flex; width: 100vw; height: 100vh;
+    display: flex; width: 100vw; height: calc(100vh - var(--titlebar-height));
     transition: filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     background-color: transparent; 
 }
@@ -52,9 +120,13 @@ body.palette-open #app-wrapper {
     width: 210px; min-width: 210px; height: 100%;
     background-color: var(--bg-sidebar); 
     border-right: 1px solid var(--border); display: flex; flex-direction: column;
-    padding-top: 40px; z-index: 10;
+    padding-top: 10px; z-index: 10;
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease, margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, opacity, margin-left;
+}
+
+body.platform-mac #sidebar {
+    padding-top: 40px;
 }
 
 #sidebar.hidden { margin-left: -210px; }
@@ -113,7 +185,7 @@ body.dark-mode .file-item.active { background: rgba(255,255,255,0.08); }
     will-change: transform, opacity, margin-top;
 }
 
-#sidebar.hidden ~ #main-container #tabs-bar { padding-left: 80px; }
+body.platform-mac #sidebar.hidden ~ #main-container #tabs-bar { padding-left: 80px; }
 
 .tab-bar-content { display: flex; align-items: flex-end; height: 100%; flex: 1; overflow: hidden; }
 
@@ -237,4 +309,34 @@ body.focus-mode #status-bar {
 
 body.focus-mode #editor { 
     margin-top: 10vh; 
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+    background-clip: padding-box;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }

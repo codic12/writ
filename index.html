@@ -80,6 +80,33 @@
         </div>
     </div>
 
+    <!-- Preferences Modal -->
+    <div id="preferences-modal" class="modal-overlay">
+        <div class="command-content preferences-content">
+            <div class="command-input-container">
+                <h2 style="margin:0; font-size:18px; font-weight:500;">Preferences</h2>
+            </div>
+            <div id="preferences-options">
+                <div class="pref-section">
+                    <label>Theme Mode</label>
+                    <div class="theme-toggle-group">
+                        <button id="theme-light-btn" onclick="setThemeMode('light')">Light</button>
+                        <button id="theme-dark-btn" onclick="setThemeMode('dark')">Dark</button>
+                    </div>
+                </div>
+                <div class="pref-section">
+                    <label>Color Scheme</label>
+                    <div id="scheme-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="command-footer">
+                <span>Esc to close</span>
+            </div>
+        </div>
+    </div>
+
     <script src="renderer.js"></script>
 </body>
 </html>

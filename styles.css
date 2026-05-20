@@ -17,9 +17,6 @@
 }
 
 body.platform-mac {
-    --bg-app: transparent; 
-    --bg-sidebar: rgba(255, 255, 255, 0.7);
-    --bg-tabs: rgba(250, 250, 248, 0.6);
     --titlebar-height: 0px;
 }
 
@@ -36,13 +33,23 @@ body.dark-mode {
     --shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-body.dark-mode.platform-mac {
-    --bg-app: transparent;
-    --bg-sidebar: rgba(30, 30, 30, 0.4);
-    --bg-tabs: rgba(40, 40, 40, 0.4);
+* { box-sizing: border-box; outline: none; }
+
+::selection {
+    background-color: var(--accent);
+    color: #ffffff;
 }
 
-* { box-sizing: border-box; outline: none; }
+body.dark-mode ::selection {
+    color: #000000;
+}
+
+/* Specific overrides for schemes where white text might not work well on accent */
+body.scheme-nord-light ::selection, 
+body.scheme-solarized-light ::selection,
+body.scheme-everforest-light ::selection {
+    color: #2e3440;
+}
 
 html, body {
     margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -111,7 +118,7 @@ body.dark-mode .control-btn:hover {
     background-color: transparent; 
 }
 
-body.palette-open #app-wrapper {
+body.modal-open #app-wrapper {
     filter: blur(15px) brightness(0.85); transform: scale(0.985); pointer-events: none;
 }
 
@@ -160,11 +167,57 @@ body.dark-mode .file-item.active { background: rgba(255,255,255,0.08); }
 .notebook-item { margin-top: 15px; }
 .notebook-header {
     padding: 8px 15px; font-size: 11px; font-weight: 600; text-transform: uppercase;
-    color: var(--text-muted); display: flex; justify-content: space-between; align-items: center;
-    cursor: pointer;
+    color: var(--text-muted); display: flex; align-items: center;
+    cursor: pointer; gap: 8px; position: relative;
 }
 
-.document-item { margin-left: 10px; }
+.notebook-header .collapse-icon {
+    transition: transform 0.2s;
+    display: flex; align-items: center;
+}
+.notebook-item.collapsed .collapse-icon { transform: rotate(-90deg); }
+.notebook-item.collapsed .notebook-docs { display: none; }
+
+.notebook-header .notebook-title { flex: 1; }
+
+.notebook-header .actions, .file-item .actions {
+    display: none; gap: 4px;
+}
+.notebook-header:hover .actions, .file-item:hover .actions {
+    display: flex;
+}
+
+.notebook-header button, .file-item button {
+    background: none; border: none; color: var(--text-muted); cursor: pointer;
+    padding: 2px; border-radius: 4px; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.notebook-header button:hover, .file-item button:hover {
+    background: rgba(0,0,0,0.05); color: var(--text-main);
+}
+body.dark-mode .notebook-header button:hover, body.dark-mode .file-item button:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.document-item { margin-left: 10px; display: flex; align-items: center; gap: 8px; position: relative; }
+.document-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+
+/* Editor Title Header */
+#editor h1.note-title {
+    margin-top: 0;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    font-size: 2.5em;
+    font-weight: 700;
+    user-select: text;
+    -webkit-user-modify: read-write;
+}
+
+#editor h1.note-title:empty::before {
+    content: "Untitled";
+    opacity: 0.3;
+}
 
 .rename-input {
     background: var(--bg-editor); border: 1px solid var(--accent); color: var(--text-main);
@@ -242,7 +295,24 @@ body.platform-mac #sidebar.hidden ~ #main-container #tabs-bar { padding-left: 80
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     display: none; justify-content: center; align-items: flex-start;
     padding-top: 15vh; z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
+
+.modal-overlay.visible {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-overlay.visible .command-content {
+    animation: modalSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalSlideDown {
+    from { opacity: 0; transform: translateY(-30px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .command-content {
     width: 600px; background: var(--bg-editor); border-radius: 14px;
     box-shadow: 0 30px 100px rgba(0,0,0,0.5); border: 1px solid var(--border);
@@ -339,4 +409,215 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 
 body.dark-mode ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+/* Preferences Styles */
+.preferences-content {
+    max-width: 500px;
+}
+
+#preferences-options {
+    padding: 20px 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.pref-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pref-section label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.theme-toggle-group {
+    display: flex;
+    background: var(--bg-tabs);
+    padding: 4px;
+    border-radius: 8px;
+    gap: 4px;
+}
+
+.theme-toggle-group button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.theme-toggle-group button.active {
+    background: var(--bg-editor);
+    color: var(--text-main);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#scheme-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.scheme-item {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.scheme-item:hover {
+    border-color: var(--accent);
+}
+
+.scheme-item.active {
+    border-color: var(--accent);
+    background: rgba(0, 122, 255, 0.05);
+}
+
+.scheme-preview {
+    display: flex;
+    height: 12px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.scheme-name {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Color Schemes */
+/* Default Light */
+body.scheme-default {
+    --bg-app: #ffffff;
+    --bg-sidebar: #f5f5f7;
+    --bg-tabs: #f0f0f2;
+    --bg-editor: #ffffff;
+    --text-main: #1d1d1f;
+    --accent: #007aff;
+}
+
+/* Nord (Light) */
+body.scheme-nord-light {
+    --bg-app: #eceff4;
+    --bg-sidebar: #e5e9f0;
+    --bg-tabs: #d8dee9;
+    --bg-editor: #eceff4;
+    --text-main: #2e3440;
+    --accent: #88c0d0;
+}
+
+/* Solarized (Light) */
+body.scheme-solarized-light {
+    --bg-app: #fdf6e3;
+    --bg-sidebar: #eee8d5;
+    --bg-tabs: #e3dbbb;
+    --bg-editor: #fdf6e3;
+    --text-main: #657b83;
+    --accent: #268bd2;
+}
+
+/* Default Dark */
+body.dark-mode.scheme-default {
+    --bg-app: #1a1a1a;
+    --bg-sidebar: #252525;
+    --bg-tabs: #2a2a2a;
+    --bg-editor: #1a1a1a;
+    --text-main: #ffffff;
+    --accent: #0a84ff;
+}
+
+/* Nord (Dark) */
+body.dark-mode.scheme-nord-dark {
+    --bg-app: #2e3440;
+    --bg-sidebar: #3b4252;
+    --bg-tabs: #434c5e;
+    --bg-editor: #2e3440;
+    --text-main: #eceff4;
+    --accent: #88c0d0;
+}
+
+/* Gruvbox (Dark) */
+body.dark-mode.scheme-gruvbox-dark {
+    --bg-app: #282828;
+    --bg-sidebar: #1d2021;
+    --bg-tabs: #32302f;
+    --bg-editor: #282828;
+    --text-main: #ebdbb2;
+    --accent: #d79921;
+}
+
+/* Sepia (Light) */
+body.scheme-sepia {
+    --bg-app: #f4ecd8;
+    --bg-sidebar: #e7dcb9;
+    --bg-tabs: #dfd4b1;
+    --bg-editor: #f4ecd8;
+    --text-main: #433422;
+    --accent: #704214;
+}
+
+/* Rosé Pine Dawn (Light) */
+body.scheme-rose-pine-dawn {
+    --bg-app: #faf4ed;
+    --bg-sidebar: #f2e9e1;
+    --bg-tabs: #ebe1d9;
+    --bg-editor: #faf4ed;
+    --text-main: #575279;
+    --accent: #d7827e;
+}
+
+/* Everforest Light */
+body.scheme-everforest-light {
+    --bg-app: #f8f5e4;
+    --bg-sidebar: #f2efdf;
+    --bg-tabs: #ebe8d5;
+    --bg-editor: #f8f5e4;
+    --text-main: #5c6a72;
+    --accent: #8da101;
+}
+
+/* Rosé Pine (Dark) */
+body.dark-mode.scheme-rose-pine-dark {
+    --bg-app: #191724;
+    --bg-sidebar: #1f1d2e;
+    --bg-tabs: #26233a;
+    --bg-editor: #191724;
+    --text-main: #e0def4;
+    --accent: #ebbcba;
+}
+
+/* Everforest Dark */
+body.dark-mode.scheme-everforest-dark {
+    --bg-app: #2d353b;
+    --bg-sidebar: #232a2e;
+    --bg-tabs: #3d484d;
+    --bg-editor: #2d353b;
+    --text-main: #d3c6aa;
+    --accent: #a7c080;
+}
+
+/* Catppuccin Mocha */
+body.dark-mode.scheme-catppuccin-mocha {
+    --bg-app: #1e1e2e;
+    --bg-sidebar: #181825;
+    --bg-tabs: #11111b;
+    --bg-editor: #1e1e2e;
+    --text-main: #cdd6f4;
+    --accent: #cba6f7;
 }
